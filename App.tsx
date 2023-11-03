@@ -5,12 +5,13 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView, Button} from 'react-native';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 
 function App(): JSX.Element {
+  const [userData, setUserData] = useState({});
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
@@ -28,19 +29,34 @@ function App(): JSX.Element {
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
     // Sign-in the user with the credential
+    console.log('Signin suceess');
     return auth().signInWithCredential(googleCredential);
   }
 
+  const logout = async () => {
+    try {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+      setUserData();
+      console.log('Signout suceess');
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <SafeAreaView>
-      <Button
-        title="Google Sign-In"
-        onPress={() =>
-          onGoogleButtonPress()
-            .then(() => console.log('Signed in with Google!'))
-            .catch(error => console.log(error, 'error'))
-        }
-      />
+      {userData ? (
+        <Button title="Google Sign-Out" onPress={() => logout()} />
+      ) : (
+        <Button
+          title="Google Sign-In"
+          onPress={() =>
+            onGoogleButtonPress()
+              .then(res => setUserData(res.additionalUserInfo))
+              .catch(error => console.log(error, 'error'))
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }
