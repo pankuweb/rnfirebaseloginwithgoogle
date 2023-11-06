@@ -11,7 +11,7 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 
 function App(): JSX.Element {
-  const [userData, setUserData] = useState({});
+  const [userData, setUserData] = useState();
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
@@ -52,7 +52,7 @@ function App(): JSX.Element {
           title="Google Sign-In"
           onPress={() =>
             onGoogleButtonPress()
-              .then(res => setUserData(res.additionalUserInfo))
+              .then(res => {setUserData(res.additionalUserInfo), console.log(res,'resx')})
               .catch(error => console.log(error, 'error'))
           }
         />
