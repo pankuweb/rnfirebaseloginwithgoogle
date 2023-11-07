@@ -38,15 +38,21 @@ function App(): JSX.Element {
 
   const logout = async () => {
     try {
-      loginGoogle
-        ? (await GoogleSignin.revokeAccess(),
-          await GoogleSignin.signOut(),
-          setUserData())
-        : setUserData();
+      if (loginGoogle) {
+        await GoogleSignin.revokeAccess();
+        await GoogleSignin.signOut();
+      } else {
+        await LoginManager.logOut();
+      }
+
+      // Handle successful logout
+      console.log('Logged out successfully');
+      setUserData();
     } catch (error) {
-      console.error(error);
+      console.error('Logout failed with error:', error);
     }
   };
+
   async function onFacebookButtonPress() {
     // Attempt login with permissions
     const result = await LoginManager.logInWithPermissions(['public_profile']);
