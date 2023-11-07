@@ -41,6 +41,7 @@ function App(): JSX.Element {
       if (loginGoogle) {
         await GoogleSignin.revokeAccess();
         await GoogleSignin.signOut();
+        setLoginGoogle(false)
       } else {
         await LoginManager.logOut();
       }
