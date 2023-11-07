@@ -13,6 +13,7 @@ import auth from '@react-native-firebase/auth';
 
 function App(): JSX.Element {
   const [userData, setUserData] = useState();
+  const [loginGoogle, setLoginGoogle] = useState(false);
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
@@ -21,6 +22,7 @@ function App(): JSX.Element {
   }, []);
 
   async function onGoogleButtonPress() {
+    setLoginGoogle(true);
     // Check if your device supports Google Play
     await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
     // Get the users ID token
@@ -36,10 +38,11 @@ function App(): JSX.Element {
 
   const logout = async () => {
     try {
-      // await GoogleSignin.revokeAccess();
-      // await GoogleSignin.signOut();
-      setUserData();
-      console.log('Signout suceess');
+      loginGoogle
+        ? (await GoogleSignin.revokeAccess(),
+          await GoogleSignin.signOut(),
+          setUserData())
+        : setUserData();
     } catch (error) {
       console.error(error);
     }
