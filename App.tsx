@@ -36,8 +36,8 @@ function App(): JSX.Element {
 
   const logout = async () => {
     try {
-      await GoogleSignin.revokeAccess();
-      await GoogleSignin.signOut();
+      // await GoogleSignin.revokeAccess();
+      // await GoogleSignin.signOut();
       setUserData();
       console.log('Signout suceess');
     } catch (error) {
@@ -71,27 +71,29 @@ function App(): JSX.Element {
   return (
     <SafeAreaView>
       {userData ? (
-        <Button title="Google Sign-Out" onPress={() => logout()} />
+        <Button title="Sign-Out" onPress={() => logout()} />
       ) : (
-        <Button
-          title="Google Sign-In"
-          onPress={() =>
-            onGoogleButtonPress()
-              .then(res => {
-                setUserData(res.additionalUserInfo), console.log(res, 'resx');
-              })
-              .catch(error => console.log(error, 'error'))
-          }
-        />
+        <>
+          <Button
+            title="Google Sign-In"
+            onPress={() =>
+              onGoogleButtonPress()
+                .then(res => {
+                  setUserData(res.additionalUserInfo);
+                })
+                .catch(error => console.log(error, 'error'))
+            }
+          />
+          <Button
+            title="Facebook Sign-In"
+            onPress={() =>
+              onFacebookButtonPress().then(res =>
+                setUserData(res.additionalUserInfo),
+              )
+            }
+          />
+        </>
       )}
-      <Button
-        title="Facebook Sign-In"
-        onPress={() =>
-          onFacebookButtonPress().then(() =>
-            console.log('Signed in with Facebook!'),
-          )
-        }
-      />
     </SafeAreaView>
   );
 }
