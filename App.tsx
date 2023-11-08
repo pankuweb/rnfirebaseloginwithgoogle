@@ -10,8 +10,13 @@ import {SafeAreaView, Button} from 'react-native';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {LoginManager, AccessToken} from 'react-native-fbsdk-next';
 import auth from '@react-native-firebase/auth';
+import AzureAuth from 'react-native-azure-auth';
 
 function App(): JSX.Element {
+  const azureAuth = new AzureAuth({
+    clientId: '2258d2d9-225d-431a-9c02-7953265b12f0',
+  });
+
   const [userData, setUserData] = useState();
   const [loginGoogle, setLoginGoogle] = useState(false);
   useEffect(() => {
@@ -41,7 +46,7 @@ function App(): JSX.Element {
       if (loginGoogle) {
         await GoogleSignin.revokeAccess();
         await GoogleSignin.signOut();
-        setLoginGoogle(false)
+        setLoginGoogle(false);
       } else {
         await LoginManager.logOut();
       }
@@ -78,6 +83,22 @@ function App(): JSX.Element {
     return auth().signInWithCredential(facebookCredential);
   }
 
+  const newLog = async () => {
+    try {
+      let tokens = await azureAuth.webAuth.authorize({
+        scope: 'openid profile User.Read Mail.Read',
+      });
+      this.setState({accessToken: tokens.accessToken});
+      let info = await azureAuth.auth.msGraphRequest({
+        token: tokens.accessToken,
+        path: '/me',
+      });
+      this.setState({user: info.displayName, userId: tokens.userId});
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <SafeAreaView>
       {userData ? (
@@ -101,6 +122,10 @@ function App(): JSX.Element {
                 setUserData(res.additionalUserInfo),
               )
             }
+          />
+          <Button
+            title="Microsoft Sign-In"
+            onPress={() => newLog().then(res => console.log(res, 'asdf'))}
           />
         </>
       )}
