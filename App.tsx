@@ -14,7 +14,7 @@ import AzureAuth from 'react-native-azure-auth';
 
 function App(): JSX.Element {
   const azureAuth = new AzureAuth({
-    clientId: '2258d2d9-225d-431a-9c02-7953265b12f0',
+    clientId: 'c33ed0aa-9f72-4ae8-bcb5-fd09bb4ffaf0',
   });
 
   const [userData, setUserData] = useState();
@@ -84,21 +84,23 @@ function App(): JSX.Element {
   }
 
   const newLog = async () => {
+    console.log('opem==>')
     try {
       let tokens = await azureAuth.webAuth.authorize({
         scope: 'openid profile User.Read Mail.Read',
       });
+      console.log(tokens, 'info');
       this.setState({accessToken: tokens.accessToken});
       let info = await azureAuth.auth.msGraphRequest({
         token: tokens.accessToken,
         path: '/me',
       });
+      console.log(info, 'info');
       this.setState({user: info.displayName, userId: tokens.userId});
     } catch (error) {
       console.log(error);
     }
   };
-
   return (
     <SafeAreaView>
       {userData ? (
