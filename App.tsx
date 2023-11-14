@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, Button, Text, Image, View, TouchableOpacity} from 'react-native';
+import {SafeAreaView, Button, Text, View, TouchableOpacity} from 'react-native';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {LoginManager, AccessToken} from 'react-native-fbsdk-next';
 import auth from '@react-native-firebase/auth';
@@ -47,7 +47,7 @@ function App(): JSX.Element {
     });
   }, []);
   async function onGoogleButtonPress() {
-    setLoginGoogle(true);
+    setLoginGoogle('google');
     await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
     const {idToken} = await GoogleSignin.signIn();
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
@@ -66,12 +66,14 @@ function App(): JSX.Element {
 
   const logout = async () => {
     try {
-      if (loginGoogle) {
+      if (loginGoogle == 'google') {
         await GoogleSignin.revokeAccess();
         await GoogleSignin.signOut();
-        setLoginGoogle(false);
-      } else {
+        setLoginGoogle('');
+      } else if(loginGoogle == 'facebook'){
         await LoginManager.logOut();
+      }else{
+        azureAuth.webAuth.clearSession();
       }
 
       console.log('Logged out successfully');
@@ -82,6 +84,7 @@ function App(): JSX.Element {
   };
 
   async function onFacebookButtonPress() {
+    setLoginGoogle('facebook');
     const result = await LoginManager.logInWithPermissions(['public_profile']);
     if (result.isCancelled) {
       throw 'User cancelled the login process';
@@ -113,6 +116,7 @@ function App(): JSX.Element {
       let tokens = await azureAuth.webAuth.authorize({
         scope: 'openid profile User.Read',
       });
+      setLoginGoogle('ms');
       setUserData(tokens);
       let info = await azureAuth.auth.msGraphRequest({
         token: tokens.accessToken,
@@ -190,10 +194,9 @@ function App(): JSX.Element {
                 .catch(error => console.log(error, 'error'))
             }
             style={{
-              backgroundColor: 'blue', // Example background color
-              padding: 10, // Example padding
-              borderRadius: 5, // Example border radius
-              // Add more styles as needed
+              backgroundColor: 'blue',
+              padding: 10,
+              borderRadius: 5,
             }}>
             <Text style={{color: 'white'}}>Google Sign-In</Text>
           </TouchableOpacity>
